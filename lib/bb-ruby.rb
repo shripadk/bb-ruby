@@ -6,10 +6,29 @@ module BBRuby
 
   # allowable image formats
   @@imageformats = 'png|bmp|jpg|gif|jpeg'
-
+  @@font_families = 'Arial|Arial Narrow|Arial Black|Comic Sans MS|Courier New|System|Times New Roman|Tahoma|Verdana'
+  @@alignment = 'left|center|right'
   # built-in BBCode tabs that will be processed
   @@tags = {
     # tag name => [regex, replace, description, example, enable/disable symbol]
+    'Back' => [
+      /\[back=['"]?(\w+|\#\w{6})['"]?(:.+)?\](.*?)\[\/back\2?\]/mi,
+      '<span style="background-color: \1;">\3</span>',
+      'Change background color',
+      '[back=red]This is text with red background[/back]',
+      :back],
+    'Font' => [
+      /\[font=['"]?(#{@@font_families})['"]?\](.*?)\[\/font\]/im,
+      '<span style="font-family: \1;">\2</span>',
+      'Change text font-family',
+      '[font=Comic Sans MS]Here is some text in Comic Sans MS[/font]',
+      :font],
+    'Align' => [
+      /\[align=['"]?(#{@@alignment})['"]?\](.*?)\[\/align\]/im,
+      '<p align="\1">\2</p>',
+      'Change text alignment',
+      '[align=center]Here is some text that is centered[/align]',
+      :align],
     'Bold' => [
       /\[b(:.*)?\](.*?)\[\/b\1?\]/mi,
       '<strong>\2</strong>',
@@ -34,18 +53,6 @@ module BBRuby
       'Strikeout',
       '[s]nevermind[/s]',
       :strikeout],
-    'Delete' => [
-      /\[del(:.+)?\](.*?)\[\/del\1?\]/mi,
-      '<del>\2</del>',
-      'Deleted text',
-      '[del]deleted text[/del]',
-      :delete],
-    'Insert' => [
-      /\[ins(:.+)?\](.*?)\[\/ins\1?\]/mi,
-      '<ins>\2</ins>',
-      'Inserted Text',
-      '[ins]inserted text[/del]',
-      :insert],
     'Code' => [
       /\[code(:.+)?\](.*?)\[\/code\1?\]/mi,
       '<code>\2</code>',
@@ -54,7 +61,7 @@ module BBRuby
       :code],
     'Size' => [
       /\[size=['"]?(.*?)['"]?\](.*?)\[\/size\]/im,
-      '<span style="font-size: \1px;">\2</span>',
+      '<span style="font-size: \1pt;">\2</span>', #SHOULD CONVERT TO PT * 4
       'Change text size',
       '[size=20]Here is some larger text[/size]',
       :size],
@@ -64,75 +71,27 @@ module BBRuby
       'Change text color',
       '[color=red]This is red text[/color]',
       :color],
-    'Ordered List' => [
-      /\[ol\](.*?)\[\/ol\]/mi,
-      '<ol>\1</ol>',
-      'Ordered list',
-      'My favorite people (alphabetical order): [ol][li]Jenny[/li][li]Alex[/li][li]Beth[/li][/ol]',
-      :orderedlist],
-    'Unordered List' => [
-      /\[ul\](.*?)\[\/ul\]/mi,
-      '<ul>\1</ul>',
-      'Unordered list',
-      'My favorite people (order of importance): [ul][li]Jenny[/li][li]Alex[/li][li]Beth[/li][/ul]',
-      :unorderedlist],
-    'List Item' => [
-      /\[li\](.*?)\[\/li\]/mi,
-      '<li>\1</li>',
-      'List item',
-      'See ol or ul',
-      :listitem],
-    'List Item (alternative)' => [
-      /\[\*(:[^\[]+)?\]([^(\[|\<)]+)/mi,
-      '<li>\2</li>',
-      'List item (alternative)',
-      '[*]list item',
-      :listitem],
-    'Unordered list (alternative)' => [
-      /\[list(:.*)?\]((?:(?!list).)*)\[\/list(:.)?\1?\]/mi,
-      '<ul>\2</ul>',
-      'Unordered list item',
-      '[list][*]item 1[*] item2[/list]',
-      :list],
     'Ordered list (numerical)' => [
       /\[list=1(:.*)?\](.+)\[\/list(:.)?\1?\]/mi,
-      '<ol>\2</ol>',
+      '<ul type="1"><li>\2</li></ul>',
       'Ordered list numerically',
       '[list=1][*]item 1[*] item2[/list]',
       :list],
     'Ordered list (alphabetical)' => [
       /\[list=a(:.*)?\](.+)\[\/list(:.)?\1?\]/mi,
-      '<ol sytle="list-style-type: lower-alpha;">\2</ol>',
+      '<ul type="a"><li>\2</li></ul>',
       'Ordered list alphabetically',
       '[list=a][*]item 1[*] item2[/list]',
       :list],
-    'Definition List' => [
-      /\[dl\](.*?)\[\/dl\]/im,
-      '<dl>\1</dl>',
-      'List of terms/items and their definitions',
-      '[dl][dt]Fusion Reactor[/dt][dd]Chamber that provides power to your... nerd stuff[/dd][dt]Mass Cannon[/dt][dd]A gun of some sort[/dd][/dl]',
-      :definelist],
-    'Definition Term' => [
-      /\[dt\](.*?)\[\/dt\]/mi,
-      '<dt>\1</dt>',
-      'List of definition terms',
-      '[dt]definition term[/dt]',
-      :defineterm],
-    'Definition Definition' => [
-      /\[dd\](.*?)\[\/dd\]/mi,
-      '<dd>\1</dd>',
-      'Definition definitions',
-      '[dd]my definition[/dd',
-      :definition],
-    'Quote' => [
-      /\[quote(:.*)?="?(.*?)"?\](.*?)\[\/quote\1?\]/mi,
-      '<fieldset><legend>\2</legend><blockquote>\3</blockquote></fieldset>',
-      'Quote with citation',
-      "[quote=mike]Now is the time...[/quote]",
-      :quote],
+    'Unordered list' => [
+      /\[list(:.*)?\]((?:(?!list).)*)\[\/list(:.)?\1?\]/mi,
+      '<ul><li>\2</li></ul>',
+      'Unordered list item',
+      '[list][*]item 1[*] item2[/list]',
+      :list],
     'Quote (Sourceless)' => [
       /\[quote(:.*)?\](.*?)\[\/quote\1?\]/mi,
-      '<fieldset><blockquote>\2</blockquote></fieldset>',
+      '<blockquote>\2</blockquote>',
       'Quote (sourceclass)',
       "[quote]Now is the time...[/quote]",
       :quote],
@@ -141,12 +100,6 @@ module BBRuby
       '<a href="\1">\2</a>',
       'Hyperlink to somewhere else',
       'Maybe try looking on [url=http://google.com]Google[/url]?',
-      :link],
-    'Link (Implied)' => [
-      /\[url\](.*?)\[\/url\]/mi,
-      '<a href="\1">\1</a>',
-      'Hyperlink (implied)',
-      "Maybe try looking on [url]http://google.com[/url]",
       :link],
     'Link (Automatic)' => [
       /(\A|\s)((https?:\/\/|www\.)[^\s<]+)/,
@@ -203,7 +156,19 @@ module BBRuby
       '<a href="mailto:\2">\2</a>',
       'Link to email address',
       '[email]wadus@wadus.com[/email]',
-      :email]
+      :email],
+    'Emoticon (Double)' => [
+      /\[emot,(['"]?(.*?)['"]?),(['"]?(.*?)['"]?)\/]/mi,
+      '<img alt="\2" src="../xheditor_emot/\1/\2.gif" />',
+      'Generate a img tag containing a emoticon(QQ/MSN)',
+      '[emot=qq,14/]',
+      :emot],
+    'Emoticon (Single)' => [
+      /\[emot,(['"]?(.*?)['"]?)\/]/mi,
+      '<img alt="\1" src="../xheditor_emot/default/\1.gif" />',
+      'Generate a img tag containing a emoticon(default)',
+      '[emot=biggrin/]',
+      :emot]
   }
 
   class << self
@@ -374,3 +339,74 @@ class String
     self.replace(BBRuby.to_html_with_formatting(self, tags_alternative_definition, escape_html, method, *tags))
   end
 end
+
+# OLD STUFF DUMPED HERE:
+# 
+# 
+# 
+# 'Ordered List' => [
+#   /\[ol\](.*?)\[\/ol\]/mi,
+#   '<ol>\1</ol>',
+#   'Ordered list',
+#   'My favorite people (alphabetical order): [ol][li]Jenny[/li][li]Alex[/li][li]Beth[/li][/ol]',
+#   :orderedlist],
+# 'Unordered List' => [
+#   /\[ul\](.*?)\[\/ul\]/mi,
+#   '<ul>\1</ul>',
+#   'Unordered list',
+#   'My favorite people (order of importance): [ul][li]Jenny[/li][li]Alex[/li][li]Beth[/li][/ul]',
+#   :unorderedlist],
+# 'List Item' => [
+#   /\[li\](.*?)\[\/li\]/mi,
+#   '<li>\1</li>',
+#   'List item',
+#   'See ol or ul',
+#   :listitem],
+# 'List Item (alternative)' => [
+#   /\[\*(:[^\[]+)?\]([^(\[|\<)]+)/mi,
+#   '<li>\2</li>',
+#   'List item (alternative)',
+#   '[*]list item',
+#   :listitem],
+# 'Definition List' => [
+#   /\[dl\](.*?)\[\/dl\]/im,
+#   '<dl>\1</dl>',
+#   'List of terms/items and their definitions',
+#   '[dl][dt]Fusion Reactor[/dt][dd]Chamber that provides power to your... nerd stuff[/dd][dt]Mass Cannon[/dt][dd]A gun of some sort[/dd][/dl]',
+#   :definelist],
+# 'Definition Term' => [
+#   /\[dt\](.*?)\[\/dt\]/mi,
+#   '<dt>\1</dt>',
+#   'List of definition terms',
+#   '[dt]definition term[/dt]',
+#   :defineterm],
+# 'Definition Definition' => [
+#   /\[dd\](.*?)\[\/dd\]/mi,
+#   '<dd>\1</dd>',
+#   'Definition definitions',
+#   '[dd]my definition[/dd',
+#   :definition],
+# 'Quote' => [
+#   /\[quote(:.*)?="?(.*?)"?\](.*?)\[\/quote\1?\]/mi,
+#   '<fieldset><legend>\2</legend><blockquote>\3</blockquote></fieldset>',
+#   'Quote with citation',
+#   "[quote=mike]Now is the time...[/quote]",
+#   :quote],
+# 'Link (Implied)' => [
+#   /\[url\](.*?)\[\/url\]/mi,
+#   '<a href="\1">\1</a>',
+#   'Hyperlink (implied)',
+#   "Maybe try looking on [url]http://google.com[/url]",
+#   :link],
+# 'Delete' => [
+#   /\[del(:.+)?\](.*?)\[\/del\1?\]/mi,
+#   '<del>\2</del>',
+#   'Deleted text',
+#   '[del]deleted text[/del]',
+#   :delete],
+# 'Insert' => [
+#   /\[ins(:.+)?\](.*?)\[\/ins\1?\]/mi,
+#   '<ins>\2</ins>',
+#   'Inserted Text',
+#   '[ins]inserted text[/del]',
+#   :insert],
