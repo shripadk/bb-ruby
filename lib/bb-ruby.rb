@@ -73,19 +73,19 @@ module BBRuby
       :color],
     'Ordered list (numerical)' => [
       /\[list=1(:.*)?\](.+)\[\/list(:.)?\1?\]/mi,
-      '<ul type="1"><li>\2</li></ul>',
+      '<ol>\2</ol>',
       'Ordered list numerically',
       '[list=1][*]item 1[*] item2[/list]',
       :list],
     'Ordered list (alphabetical)' => [
       /\[list=a(:.*)?\](.+)\[\/list(:.)?\1?\]/mi,
-      '<ul type="a"><li>\2</li></ul>',
+      '<ol style="list-style-type: lower-alpha;">\2</ol>',
       'Ordered list alphabetically',
       '[list=a][*]item 1[*] item2[/list]',
       :list],
     'Unordered list' => [
       /\[list(:.*)?\]((?:(?!list).)*)\[\/list(:.)?\1?\]/mi,
-      '<ul><li>\2</li></ul>',
+      '<ul>\2</ul>',
       'Unordered list item',
       '[list][*]item 1[*] item2[/list]',
       :list],
