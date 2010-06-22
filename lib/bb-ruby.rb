@@ -71,6 +71,36 @@ module BBRuby
       'Change text color',
       '[color=red]This is red text[/color]',
       :color],
+    'Ordered List' => [
+      /\[ol\](.*?)\[\/ol\]/mi,
+      '<ol>\1</ol>',
+      'Ordered list',
+      'My favorite people (alphabetical order): [ol][li]Jenny[/li][li]Alex[/li][li]Beth[/li][/ol]',
+      :orderedlist],
+    'Unordered List' => [
+      /\[ul\](.*?)\[\/ul\]/mi,
+      '<ul>\1</ul>',
+      'Unordered list',
+      'My favorite people (order of importance): [ul][li]Jenny[/li][li]Alex[/li][li]Beth[/li][/ul]',
+      :unorderedlist],
+    'List Item' => [
+      /\[li\](.*?)\[\/li\]/mi,
+      '<li>\1</li>',
+      'List item',
+      'See ol or ul',
+      :listitem],
+    'List Item (alternative)' => [
+      /\[\*(:[^\[]+)?\]([^(\[|\<)]+)/mi,
+      '<li>\2</li>',
+      'List item (alternative)',
+      '[*]list item',
+      :listitem],
+    'Unordered list (alternative)' => [
+      /\[list(:.*)?\]((?:(?!list).)*)\[\/list(:.)?\1?\]/mi,
+      '<ul>\2</ul>',
+      'Unordered list item',
+      '[list][*]item 1[*] item2[/list]',
+      :list],
     'Ordered list (numerical)' => [
       /\[list=1(:.*)?\](.+)\[\/list(:.)?\1?\]/mi,
       '<ol>\2</ol>',
@@ -79,15 +109,9 @@ module BBRuby
       :list],
     'Ordered list (alphabetical)' => [
       /\[list=a(:.*)?\](.+)\[\/list(:.)?\1?\]/mi,
-      '<ol style="list-style-type: lower-alpha;">\2</ol>',
+      '<ol sytle="list-style-type: lower-alpha;">\2</ol>',
       'Ordered list alphabetically',
       '[list=a][*]item 1[*] item2[/list]',
-      :list],
-    'Unordered list' => [
-      /\[list(:.*)?\]((?:(?!list).)*)\[\/list(:.)?\1?\]/mi,
-      '<ul>\2</ul>',
-      'Unordered list item',
-      '[list][*]item 1[*] item2[/list]',
       :list],
     'Quote (Sourceless)' => [
       /\[quote(:.*)?\](.*?)\[\/quote\1?\]/mi,
